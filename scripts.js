@@ -195,9 +195,7 @@ $('#contactForm').submit(function(event) {
 // Delete button handler
 //
 $('#contactDelete').click(function(event) {
-  var toDelete = $('#contactSelect').find('option:selected');
-
-  toDelete.each(function(index, option) {
+  $('#contactSelect').find('option:selected').each(function(index, option) {
     var strContact = $(option).text().split(' ');
 
     // removing unnecessary characters
