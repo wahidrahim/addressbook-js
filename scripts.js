@@ -1,22 +1,28 @@
+//
 // Capitalizes the first letter in a string, used for formatting contact names
+//
 String.prototype.capitalize = function() {
   return this.charAt(0).toUpperCase() + this.slice(1);
 }
-
+//
 // Contains all the functions required for manipulating the contact form
+//
 var FormUtils = (function() {
   var $fname = $('input#firstName');
   var $lname = $('input#lastName');
   var $phone = $('input#phone');
   var phoneNum;
-
+  //
   // Displays a single warning
+  //
   var showWarning = function(warning) { $('#warnings').append($('<li>', {text: warning})); }
-
+  //
   // Clears any existing validation warnings
+  //
   var clearWarnings = function() { $('#warnings').empty(); }
-
+  //
   // Validates form data, displays warnings accordingly, returns true if form is valid otherwise false
+  //
   var validForm = function() {
     phoneNum  = Number($phone.val().split(' ').join(''));
 
@@ -38,15 +44,17 @@ var FormUtils = (function() {
     else
       return true;
   }
-
+  //
   // Clears the form and unfocuses input elements
+  //
   var clearForm = function() {
     $fname.val('').blur();
     $lname.val('').blur();
     $phone.val('').blur();
   }
-
+  //
   // Creates a contact object from valid form data
+  //
   var createContact = function() {
     if (validForm()) {
       return {
@@ -56,19 +64,23 @@ var FormUtils = (function() {
       }
     }
   }
-
+  //
   // Public interface for FormUtils
+  //
   return {
     clearForm: clearForm,
     clearWarnings: clearWarnings,
     createContact: createContact
   }
 })();
-
+//
 // The AddressBook object contains all the necessary functions for adding, deleting
 // and sorting contacts, as well as manipulating the multiselect (address book)
+//
 var AddressBook = (function() {
+  //
   // Contacts array to contain all contacts, included are some premade contacts for testing
+  //
   var contacts = [{
     fname: 'Jon',
     lname: 'Smith',
@@ -82,15 +94,17 @@ var AddressBook = (function() {
     lname: 'Rahim',
     phone: 2262205920
   }];
-
+  //
   // Returns a calculated length string line, for visual display purposes
+  //
   var addLine = function(name, length) {
     var count = (length - name.length > 1) ? length - name.length : 1;
 
     return '—'.repeat(count);
   }
-
+  //
   // Returns a jQuery option element filled with appropriate contact information
+  //
   var contactOption = function(contact) {
     var name = contact.fname + ' ' + contact.lname;
     var $option = $('<option>', {
@@ -100,27 +114,31 @@ var AddressBook = (function() {
 
     return $option;
   }
-
+  //
   // Returns true if the two contacts a and b have matching fields otherwise false
+  //
   var contactsMatch = function(a, b) {
     return a.fname === b.fname && a.lname === b.lname && a.phone === b.phone;
   }
-
+  //
   // Clears the multiselect and re-populate it with the contacts array
+  //
   var refresh = function() {
     $('#contactSelect').find('option').remove();
     contacts.map(function(contact) {
       $('#contactSelect').append(contactOption(contact));
     });
   }
-
+  // 
   // Add a formatted contact to the AddressBook
+  //
   var add = function(contact) {
     contacts.push(contact);
     refresh();
   }
-
+  //
   // Delete an existing contact from the AddressBook
+  //
   var remove = function(deleteContact) {
     var index;
 
@@ -133,8 +151,9 @@ var AddressBook = (function() {
     contacts.splice(index, 1);
     refresh();
   }
-
+  //
   // Sort AddressBook contacts according to sortBy parameter
+  //
   var sort = function(sortBy) {
     if (sortBy === 'fname') 
       contacts.sort(function(a, b) { return a.fname.localeCompare(b.fname); });
@@ -145,19 +164,22 @@ var AddressBook = (function() {
 
     refresh();
   }
-
+  //
   // Populate the multiselect on initilization
+  //
   refresh();
-
+  //
   // Public interface for AddressBook
+  //
   return {
     add: add,
     remove: remove,
     sort: sort
   };
 })();
-
+//
 // Form submission  handler
+//
 $('#contactForm').submit(function(event) {
   event.preventDefault();
   FormUtils.clearWarnings();
@@ -169,14 +191,16 @@ $('#contactForm').submit(function(event) {
     FormUtils.clearForm();
   }
 });
-
+//
 // Delete button handler
+//
 $('#contactDelete').click(function(event) {
   var toDelete = $('#contactSelect').find('option:selected');
 
   toDelete.each(function(index, option) {
     var strContact = $(option).text().split(' ');
 
+    // removing unnecessary characters
     strContact.splice(2, 2);
 
     var contact = {
@@ -188,8 +212,9 @@ $('#contactDelete').click(function(event) {
     AddressBook.remove(contact);
   });
 });
-
+//
 // Sort buttons handlers
+//
 $('#contactSortFname').click(function(event) { AddressBook.sort('fname'); });
 $('#contactSortLname').click(function(event) { AddressBook.sort('lname'); });
 $('#contactSortPhone').click(function(event) { AddressBook.sort(); });
