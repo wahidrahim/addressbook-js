@@ -42,4 +42,5 @@ label + input {
   height: 220px;
   overflow: auto;
   margin-bottom: 2px;
+  margin-left: 3px;
 }
