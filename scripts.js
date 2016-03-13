@@ -1,184 +1,196 @@
-//
-// contacts array to contain all contacts.
-// here are some dummy contacts for testing
-//
-var contacts = [{
-  fname: 'Jon',
-  lname: 'Smith',
-  phone: 4165551234
-},{
-  fname: 'Jane',
-  lname: 'Doe',
-  phone: 6475554321
-},{
-  fname: 'Wahid',
-  lname: 'Rahim',
-  phone: 2262205920
-}];
-//
-// returns a jQuery option element
-// filled with appropriate contact information
-//
-var contactOption = function(contact) {
-  var $option = $('<option>', {
-    value: contact.phone,
-    text: contact.phone + ' - ' + contact.fname + ' ' + contact.lname
-  });
-
-  return $option;
-}
-//
-// populate multiselect with existing contacts
-//
-var fillAddressBook = function() {
-  $('#contactSelect').find('option').remove();
-
-  contacts.forEach(function(contact) {
-    $('#contactSelect').append(contactOption(contact));
-  });
-}
-//
-// clears form and unfocuses from input elements
-//
-var clearForm = function() {
-  $('input#firstName').val('').blur();
-  $('input#lastName').val('').blur();
-  $('input#phone').val('').blur();
-}
-//
-// returns true if num is a valid 10-digit number
-//
-var isPhoneNum = function(num) {
-  if (!isNaN(num) && num.toString().length === 10)
-    return true;
-  else
-    return false;
-}
-//
-// show form validation warnings
-//
-var showWarning = function(warning) {
-  $('#warnings').append($('<li>', {
-    text: warning
-  }));
-}
-//
-// remove any existing warnings
-//
-var clearWarnings = function() {
-  $('#warnings').empty();
+// Capitalizes the first letter in a string, used for formatting contact names
+String.prototype.capitalize = function() {
+  return this.charAt(0).toUpperCase() + this.slice(1);
 }
 
-//
-// validates form data and displays warnings accordingly
-//
-var validForm = function($fname, $lname, $phone, phoneNum) {
-  // form validations
-  if ($fname.val() === '' || $lname.val() === '' || !isPhoneNum(phoneNum)) {
-    if ($fname.val() === '') {
-      showWarning('First name must not be empty');
-      $fname.val('');
-    }
-    if ($lname.val() === '') {
-      showWarning('Last name must not be empty');
-      $lname.val('');
-    }
-    if (!isPhoneNum(phoneNum)) {
-      showWarning('Phone # must be a valid 10-digit number');
-      $phone.val('');
-    }
-    return false;
-  }
-  else {
-    return true;
-  }
-}
-//
-// handles form submissions: adds a new contact
-// to the address book
-//
-$('#contactForm').submit(function(event) {
-  event.preventDefault();
-  clearWarnings();
-
+// Contains all the functions required for manipulating the contact form
+var FormUtils = (function() {
   var $fname = $('input#firstName');
   var $lname = $('input#lastName');
   var $phone = $('input#phone');
-  var phoneNum = Number($phone.val().split(' ').join(''));
+  var phoneNum;
 
-  // run validations and add if and only if inputs are valid
-  if (validForm($fname, $lname, $phone, phoneNum)) {
-    var contact = {
-      fname: $fname.val(),
-      lname: $lname.val(),
-      phone: phoneNum
+  // Displays a single warning
+  var showWarning = function(warning) {
+    $('#warnings').append($('<li>', {
+      text: warning
+    }));
+  }
+
+  // Returns true if num is a valid 10-digit number
+  var isPhoneNum = function(num) {
+    return (!isNaN(num) && num.toString().length === 10) ? true : false;
+  }
+
+  // Validates form data, displays warnings accordingly, returns true if form is valid otherwise false
+  var validForm = function() {
+    phoneNum  = Number($phone.val().split(' ').join(''));
+
+    if ($fname.val() === '' || $lname.val() === '' || !isPhoneNum(phoneNum)) {
+      if ($fname.val() === '') {
+        showWarning('First name must not be empty');
+        $fname.val('');
+      }
+      if ($lname.val() === '') {
+        showWarning('Last name must not be empty');
+        $lname.val('');
+      }
+      if (!isPhoneNum(phoneNum)) {
+        showWarning('Phone # must be a valid 10-digit number');
+        $phone.val('');
+      }
+      return false;
     }
+    else
+      return true;
+  }
 
-    // add to addrses book
-    contacts.push(contact);
-    $('#contactSelect').append(contactOption(contact));
+  // Public interface for FormUtils
+  return {
+    // Clears the form and unfocuses input elements
+    clearForm: function() {
+      $fname.val('').blur();
+      $lname.val('').blur();
+      $phone.val('').blur();
+    },
+    // Clears any existing validation warnings
+    clearWarnings: function() {$('#warnings').empty();},
+    // Creates a contact object from valid form data
+    createContact: function() {
+      if (validForm()) {
+        return {
+          fname: $fname.val(),
+          lname: $lname.val(),
+          phone: phoneNum
+        }
+      }
+    }
+  }
+})();
 
-    // reset the form
-    clearForm();
-    return;
+// The AddressBook object contains all the necessary functions for adding, deleting
+// and sorting contacts, as well as manipulating the multiselect (address book)
+var AddressBook = (function() {
+  // Contacts array to contain all contacts,
+  // including some premade contacts for testing
+  var contacts = [{
+    fname: 'Jon',
+    lname: 'Smith',
+    phone: 4165551234
+  },{
+    fname: 'Jane',
+    lname: 'Doe',
+    phone: 6475554321
+  },{
+    fname: 'Wahid',
+    lname: 'Rahim',
+    phone: 2262205920
+  }];
+
+  // Returns a jQuery option element filled with appropriate contact information
+  var contactOption = function(contact) {
+    var $option = $('<option>', {
+      value: contact.phone,
+      text: contact.phone + ' - ' + contact.fname + ' ' + contact.lname
+    });
+    return $option;
+  }
+
+  // Capitalizes the first and last name of the contact before saving to AddressBook
+  var formatContact = function(contact) {
+    contact.fname = contact.fname.capitalize();
+    contact.lname = contact.lname.capitalize();
+  }
+
+  // Clears the multiselect and re-populate it with the contacts array
+  var refresh = function() {
+    $('#contactSelect').find('option').remove();
+    contacts.forEach(function(contact) {
+      $('#contactSelect').append(contactOption(contact));
+    });
+  }
+
+  // Populate the multiselect on initilization
+  refresh();
+
+  return {
+    // Add a formatted contact to the AddressBook
+    add: function(contact) {
+      formatContact(contact);
+      contacts.push(contact);
+      refresh();
+    },
+    // Delete an existing contact from the AddressBook
+    delete: function(deleteContact) {
+      var index;
+
+      contacts.forEach(function(contact, i) {
+        if (contact.fname === deleteContact.fname &&
+            contact.lname === deleteContact.lname &&
+            contact.phone === deleteContact.phone) {
+          index = i;
+          return;
+        }
+      });
+
+      contacts.splice(index, 1);
+      refresh();
+    },
+    // Sort AddressBook contacts according to sortBy parameter
+    sort: function(sortBy) {
+      if (sortBy === 'fname') {
+        contacts.sort(function(a, b) {
+          return a.fname.localeCompare(b.fname);
+        });
+      }
+      else if (sortBy === 'lname') {
+        contacts.sort(function(a, b) {
+          return a.lname.localeCompare(b.lname);
+        });
+      }
+      else {
+        contacts.sort(function(a, b) {
+          return a.phone - b.phone;
+        });
+      }
+      refresh();
+    }
+  };
+})();
+
+// Form submission  handler
+$('#contactForm').submit(function(event) {
+  event.preventDefault();
+  FormUtils.clearWarnings();
+
+  var contact = FormUtils.createContact();
+
+  if (contact) {
+    AddressBook.add(contact);
+    FormUtils.clearForm();
   }
 });
-//
-// returns the index of a contact object
-// determined by the phone number of the contact
-// which is assumed to be unique
-//
-var indexOfContact = function(phone) {
-  var index = contacts.findIndex(function(contact) {
-    return contact.phone === phone;
-  });
 
-  return index;
-}
-//
-// 'delete' button handler
-//
+// Delete button handler
 $('#contactDelete').click(function(event) {
   var toDelete = $('#contactSelect').find('option:selected');
 
   toDelete.each(function(index, option) {
-    var phoneNum = Number($(option).val());
-    // remove contact from array
-    contacts.splice(indexOfContact(phoneNum), 1);
-  })
+    var strContact = $(option).text().split(' ');
 
-  fillAddressBook(contacts);
-});
-//
-// 'sort by first name' button handler
-//
-$('#contactSortFname').click(function(event) {
-  contacts.sort(function(a, b) {
-    return a.fname.localeCompare(b.fname);
+    strContact.splice(1, 1);
+
+    var contact = {
+      fname: strContact[1],
+      lname: strContact[2],
+      phone: Number(strContact[0])
+    }
+
+    AddressBook.delete(contact);
   });
-
-  fillAddressBook(contacts);
-});
-//
-// 'sort by last name' button handler
-//
-$('#contactSortLname').click(function(event) {
-  contacts.sort(function(a, b) {
-    return a.lname.localeCompare(b.lname);
-  });
-
-  fillAddressBook(contacts);
-});
-//
-// 'sort by phone number' button handler
-//
-$('#contactSortPhone').click(function(event) {
-  contacts.sort(function(a, b) {
-    return a.phone - b.phone;
-  });
-
-  fillAddressBook(contacts);
 });
 
-// populating addrss book with dummy contacts
-fillAddressBook(contacts);
+// Sort buttons handlers
+$('#contactSortFname').click(function(event) {AddressBook.sort('fname');});
+$('#contactSortLname').click(function(event) {AddressBook.sort('lname');});
+$('#contactSortPhone').click(function(event) {AddressBook.sort();});
