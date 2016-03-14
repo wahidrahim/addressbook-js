@@ -2,7 +2,6 @@ body {
   background-color: #E4F1FE;
   font-family: sans-serif;
 }
-
 .container {
   padding: 25px 25px 50px 25px;
   background-color: #19B5FE;
@@ -12,29 +11,25 @@ body {
   margin-top: 100px;
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
-
-label, input {
-  display: inline-block;
+#warnings {
+  text-align: left;
+  color: red;
 }
-
 label {
   width: 100px;
   text-align: left;
+}
+label, input {
+  display: inline-block;
 }
 label + input {
   width: 300px;
   margin: 2px;
 }
-
-#warnings {
-  text-align: left;
-  color: red;
-}
 #contactForm input[type="submit"] {
   width: 410px;
   margin: 2px;
 }
-
 #contactSelect {
   font-family: monospace;
   font-size: 24px;
@@ -43,4 +38,7 @@ label + input {
   overflow: auto;
   margin-bottom: 2px;
   margin-left: 3px;
+}
+#contactSelect option {
+  text-transform: capitalize;
 }

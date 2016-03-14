@@ -1,10 +1,4 @@
 //
-// Capitalizes the first letter in a string, used for formatting contact names
-//
-String.prototype.capitalize = function() {
-  return this.charAt(0).toUpperCase() + this.slice(1);
-}
-//
 // Contains all the functions required for manipulating the contact form
 //
 var FormUtils = (function() {
@@ -21,23 +15,12 @@ var FormUtils = (function() {
   //
   var clearWarnings = function() { $('#warnings').empty(); }
   //
-  // Returns true if form data is invalid
-  //
-  var invalidForm = function() { 
-    return ($fname.val() === '' ||
-            $lname.val() === '' || 
-            $fname.val().trim().split(' ').length > 1 ||
-            $lname.val().trim().split(' ').length > 1 ||
-            phoneNum < 0 ||
-            isNaN(phoneNum));
-  }
-  //
   // Validates form data, displays warnings accordingly, returns true if form is valid otherwise false
   //
   var validForm = function() {
     phoneNum  = Number($phone.val().split(' ').join(''));
 
-    if (invalidForm()) {
+    if ($fname.val() === '' ||$lname.val() === '' || phoneNum < 0 || isNaN(phoneNum)) {
       if ($fname.val() === '') {
         showWarning('First name must not be empty');
         $fname.val('');
@@ -46,22 +29,15 @@ var FormUtils = (function() {
         showWarning('Last name must not be empty');
         $lname.val('');
       }
-      if ($fname.val().trim().split(' ').length > 1) {
-        showWarning('First name must be one word');
-        $fname.val('');
-      }
-      if ($lname.val().trim().split(' ').length > 1) {
-        showWarning('Last name must be one word');
-        $lname.val('');
-      }
       if (isNaN(phoneNum) || phoneNum <= 0) {
         showWarning('Phone # must be a valid number');
         $phone.val('');
       }
       return false;
     }
-    else
+    else {
       return true;
+    }
   }
   //
   // Clears the form and unfocuses input elements
@@ -77,8 +53,8 @@ var FormUtils = (function() {
   var createContact = function() {
     if (validForm()) {
       return {
-        fname: $fname.val().trim().capitalize(),
-        lname: $lname.val().trim().capitalize(),
+        fname: $fname.val().trim(),
+        lname: $lname.val().trim(),
         phone: phoneNum
       }
     }
@@ -101,18 +77,35 @@ var AddressBook = (function() {
   // Contacts array to contain all contacts, included are some premade contacts for testing
   //
   var contacts = [{
-    fname: 'Jon',
-    lname: 'Smith',
+    id: 1,
+    fname: 'jon',
+    lname: 'smith',
     phone: 4165551234
   },{
-    fname: 'Jane',
-    lname: 'Doe',
+    id: 2,
+    fname: 'jane',
+    lname: 'doe',
     phone: 6475554321
   },{
-    fname: 'Wahid',
-    lname: 'Rahim',
+    id: 3,
+    fname: 'wahid',
+    lname: 'rahim',
     phone: 2262205920
+  },{
+    id: 4,
+    fname: 'clark j.',
+    lname: 'kent',
+    phone: 2960011938
+  },{
+    id: 5,
+    fname: 'bruce',
+    lname: 'wayne',
+    phone: 7382930424
   }];
+  //
+  // ID to assign the next contact, then it is incremented by one
+  //
+  var newID = contacts.length + 1;
   //
   // Returns a calculated length string line, for visual display purposes
   //
@@ -126,18 +119,13 @@ var AddressBook = (function() {
   //
   var contactOption = function(contact) {
     var name = contact.fname + ' ' + contact.lname;
+    var separator = ' ' + addLine(name, 17) + ' 📱 ';
     var $option = $('<option>', {
-      value: contact.phone,
-      text: name + ' ' + addLine(name, 15) + ' 📱 ' + contact.phone
+      value: contact.id,
+      text: name + separator + contact.phone
     });
 
     return $option;
-  }
-  //
-  // Returns true if the two contacts a and b have matching fields otherwise false
-  //
-  var contactsMatch = function(a, b) {
-    return a.fname === b.fname && a.lname === b.lname && a.phone === b.phone;
   }
   //
   // Clears the multiselect and re-populate it with the contacts array
@@ -152,17 +140,19 @@ var AddressBook = (function() {
   // Add a formatted contact to the AddressBook
   //
   var add = function(contact) {
+    contact.id = newID;
     contacts.push(contact);
     refresh();
+    newID++;
   }
   //
   // Delete an existing contact from the AddressBook
   //
-  var remove = function(deleteContact) {
+  var remove = function(deleteID) {
     var index;
 
     contacts.map(function(contact, i) {
-      if (contactsMatch(contact, deleteContact)) {
+      if (contact.id == deleteID) {
         index = i;
         return;
       }
@@ -174,13 +164,15 @@ var AddressBook = (function() {
   // Sort AddressBook contacts according to sortBy parameter
   //
   var sort = function(sortBy) {
-    if (sortBy === 'fname') 
+    if (sortBy === 'fname') {
       contacts.sort(function(a, b) { return a.fname.localeCompare(b.fname); });
-    else if (sortBy === 'lname')
+    }
+    else if (sortBy === 'lname') {
       contacts.sort(function(a, b) { return a.lname.localeCompare(b.lname); });
-    else
+    }
+    else {
       contacts.sort(function(a, b) { return a.phone - b.phone; });
-
+    }
     refresh();
   }
   //
@@ -213,25 +205,16 @@ $('#contactForm').submit(function(event) {
 //
 // Delete button handler
 //
-$('#contactDelete').click(function(event) {
+$('#contactDelete').click(function() {
   $('#contactSelect').find('option:selected').each(function(index, option) {
-    var strContact = $(option).text().split(' ');
+    var deleteID = $(option).val();
 
-    // removing unnecessary characters
-    strContact.splice(2, 2);
-
-    var contact = {
-      fname: strContact[0],
-      lname: strContact[1],
-      phone: Number(strContact[2])
-    }
-
-    AddressBook.remove(contact);
+    AddressBook.remove(deleteID);
   });
 });
 //
 // Sort buttons handlers
 //
-$('#contactSortFname').click(function(event) { AddressBook.sort('fname'); });
-$('#contactSortLname').click(function(event) { AddressBook.sort('lname'); });
-$('#contactSortPhone').click(function(event) { AddressBook.sort(); });
+$('#contactSortFname').click(function() { AddressBook.sort('fname'); });
+$('#contactSortLname').click(function() { AddressBook.sort('lname'); });
+$('#contactSortPhone').click(function() { AddressBook.sort(); });
