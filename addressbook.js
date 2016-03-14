@@ -26,8 +26,8 @@ var FormUtils = (function() {
   var invalidForm = function() { 
     return ($fname.val() === '' ||
             $lname.val() === '' || 
-            $fname.val().split(' ').length > 1 ||
-            $lname.val().split(' ').length > 1 ||
+            $fname.val().trim().split(' ').length > 1 ||
+            $lname.val().trim().split(' ').length > 1 ||
             phoneNum < 0 ||
             isNaN(phoneNum));
   }
@@ -46,11 +46,11 @@ var FormUtils = (function() {
         showWarning('Last name must not be empty');
         $lname.val('');
       }
-      if ($fname.val().split(' ').length > 1) {
+      if ($fname.val().trim().split(' ').length > 1) {
         showWarning('First name must be one word');
         $fname.val('');
       }
-      if ($lname.val().split(' ').length > 1) {
+      if ($lname.val().trim().split(' ').length > 1) {
         showWarning('Last name must be one word');
         $lname.val('');
       }
