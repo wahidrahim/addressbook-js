@@ -21,18 +21,37 @@ var FormUtils = (function() {
   //
   var clearWarnings = function() { $('#warnings').empty(); }
   //
+  // Returns true if form data is invalid
+  //
+  var invalidForm = function() { 
+    return ($fname.val() === '' ||
+            $lname.val() === '' || 
+            $fname.val().split(' ').length > 1 ||
+            $lname.val().split(' ').length > 1 ||
+            phoneNum < 0 ||
+            isNaN(phoneNum));
+  }
+  //
   // Validates form data, displays warnings accordingly, returns true if form is valid otherwise false
   //
   var validForm = function() {
     phoneNum  = Number($phone.val().split(' ').join(''));
 
-    if ($fname.val() === '' || $lname.val() === '' || isNaN(phoneNum) || phoneNum <= 0) {
+    if (invalidForm()) {
       if ($fname.val() === '') {
         showWarning('First name must not be empty');
         $fname.val('');
       }
       if ($lname.val() === '') {
         showWarning('Last name must not be empty');
+        $lname.val('');
+      }
+      if ($fname.val().split(' ').length > 1) {
+        showWarning('First name must be one word');
+        $fname.val('');
+      }
+      if ($lname.val().split(' ').length > 1) {
+        showWarning('Last name must be one word');
         $lname.val('');
       }
       if (isNaN(phoneNum) || phoneNum <= 0) {
