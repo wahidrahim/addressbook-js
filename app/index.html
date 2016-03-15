@@ -2,37 +2,40 @@
 <html>
   <head>
     <meta charset='utf8'>
-    <title>JavaScript Evaluation - Wahid Rahim</title>
+    <title>AddressBook.js</title>
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
     <div class="container">
+
       <h1>Address Book</h1>
-      <ul id="warnings">
-      </ul>
+
+      <ul id="warnings"></ul>
+
       <form id="contactForm">
-        <label for="firstName">
-          First name:
-        </label>
+
+        <label for="firstName">First name:</label>
         <input id="firstName" type="text"><br>
-        <label for="lastName">
-          Last name:
-        </label>
+
+        <label for="lastName">Last name:</label>
         <input id="lastName" type="text"><br>
-        <label for="phone">
-          Phone #:
-        </label>
+
+        <label for="phone">Phone #:</label>
         <input id="phone" type="text"><br>
+
         <input type="submit" value="add contact">
+
       </form>
 
       <h3>Contacts</h3>
+
       <select multiple id="contactSelect"></select>
       <br>
       <button id="contactDelete" type="button">delete</button>
       <button id="contactSortFname" type="button">sort by first name</button>
       <button id="contactSortLname" type="button">sort by last name</button>
       <button id="contactSortPhone" type="button">sort by phone number</button>
+
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
