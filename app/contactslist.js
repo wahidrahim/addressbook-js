@@ -69,10 +69,10 @@ var FormUtils = (function() {
   }
 })();
 //
-// The AddressBook object contains all the necessary functions for adding, deleting
-// and sorting contacts, as well as manipulating the multiselect (address book)
+// The ContactsList object contains all the necessary functions for adding, deleting
+// and sorting contacts, as well as manipulating the multiselect (contacts list)
 //
-var AddressBook = (function() {
+var ContactsList = (function() {
   //
   // Contacts array to contain all contacts, included are some premade contacts for testing
   //
@@ -137,7 +137,7 @@ var AddressBook = (function() {
     });
   }
   // 
-  // Add a formatted contact to the AddressBook
+  // Add a formatted contact to the ContactsList
   //
   var add = function(contact) {
     contact.id = newID;
@@ -146,7 +146,7 @@ var AddressBook = (function() {
     newID++;
   }
   //
-  // Delete an existing contact from the AddressBook
+  // Delete an existing contact from the ContactsList
   //
   var remove = function(deleteID) {
     var index;
@@ -161,7 +161,7 @@ var AddressBook = (function() {
     refresh();
   }
   //
-  // Sort AddressBook contacts according to sortBy parameter
+  // Sort ContactsList contacts according to sortBy parameter
   //
   var sort = function(sortBy) {
     if (sortBy === 'fname') {
@@ -180,7 +180,7 @@ var AddressBook = (function() {
   //
   refresh();
   //
-  // Public interface for AddressBook
+  // Public interface for ContactsList
   //
   return {
     add: add,
@@ -198,7 +198,7 @@ $('#contactForm').submit(function(event) {
   var contact = FormUtils.createContact();
 
   if (contact) {
-    AddressBook.add(contact);
+    ContactsList.add(contact);
     FormUtils.clearForm();
   }
 });
@@ -209,12 +209,12 @@ $('#contactDelete').click(function() {
   $('#contactSelect').find('option:selected').each(function(index, option) {
     var deleteID = $(option).val();
 
-    AddressBook.remove(deleteID);
+    ContactsList.remove(deleteID);
   });
 });
 //
 // Sort buttons handlers
 //
-$('#contactSortFname').click(function() { AddressBook.sort('fname'); });
-$('#contactSortLname').click(function() { AddressBook.sort('lname'); });
-$('#contactSortPhone').click(function() { AddressBook.sort(); });
+$('#contactSortFname').click(function() { ContactsList.sort('fname'); });
+$('#contactSortLname').click(function() { ContactsList.sort('lname'); });
+$('#contactSortPhone').click(function() { ContactsList.sort(); });
