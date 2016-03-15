@@ -1,0 +1,14 @@
+{
+  "name": "addressbook.js",
+  "version": "1.0.0",
+  "description": "A simple address book written in JavaScript using jQuery.",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "Wahid Rahim",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "express": "^4.13.4"
+  }
+}
