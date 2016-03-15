@@ -90,7 +90,7 @@ var AddressBook = (function() {
     id: 3,
     fname: 'wahid',
     lname: 'rahim',
-    phone: 2262205920
+    phone: 2227001337
   },{
     id: 4,
     fname: 'clark j.',
